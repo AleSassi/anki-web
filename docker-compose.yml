@@ -1,0 +1,8 @@
+version: '3'
+services:
+  anki-web-django:
+    container_name: anki-web-django
+    ports:
+      - "27708:8000"
+    build: './'
+    restart: always
