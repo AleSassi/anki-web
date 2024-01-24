@@ -7,6 +7,6 @@ backend.include_router(login.router)
 backend.include_router(logout.router)
 backend.include_router(signup.router)
 
-@backend.get("/")
+@backend.get("/api")
 def test():
     return {"message": "Hello FastAPI"}

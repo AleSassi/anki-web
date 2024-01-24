@@ -5,9 +5,9 @@ from fastapi import APIRouter, Request
 
 router = APIRouter()
 
-prefix_route = "/login"
+prefix_route = "/api/login"
 
-@router.post("/login")
+@router.post(prefix_route)
 async def login_post(request: Request):
     auth = Auth()
     request_json = await request.json()

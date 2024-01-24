@@ -4,7 +4,7 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-prefix_route = "/logout"
+prefix_route = "/api/logout"
 
 @router.post(prefix_route)
 def logout_post(response: Response):

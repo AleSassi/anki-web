@@ -6,7 +6,7 @@ from fastapi.responses import JSONResponse
 
 router = APIRouter()
 
-prefix_route = "/signup"
+prefix_route = "/api/signup"
 
 @router.post(prefix_route)
 async def signup_post(request: Request):
