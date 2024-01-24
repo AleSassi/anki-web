@@ -12,10 +12,18 @@ class TokenData:
     def __init__(self, username: str = None):
         self.username = username
 
+class User:
+    username: str
+    password: str
+
+    def __init__(self, username: str, password: str):
+        self.username = username
+        self.password = password
+
 class Auth:
     database_path = "/app/db/auth.db"
 
-    def get_user(self, username: str):
+    def get_user(self, username: str) -> User | None:
         self.check_create_db()
         
         con = sqlite3.connect(self.database_path)
@@ -28,7 +36,7 @@ class Auth:
         username = data[0]
         password = data[1]
         con.close()
-        return {"username": username, "password": password}
+        return User(username, password)
     
     def check_create_db(self):
         if not os.path.exists('/app/db'):
@@ -48,7 +56,7 @@ class Auth:
         con.commit()
         con.close()
     
-    def verify_token(self, token: str):
+    def verify_token(self, token: str) -> TokenData:
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
@@ -64,9 +72,9 @@ class Auth:
             raise credentials_exception
         return token_data
     
-    def login_for_access_token(self, username: str, password: str):
+    def login_for_access_token(self, username: str, password: str) -> str:
         user = self.get_user(username)
-        if user and self.check_hashed_pwd(user['password'], password):
+        if user and self.check_hashed_pwd(user.password, password):
             token_data = {"uname": username}
             token = jwt.encode(token_data, SECRET_KEY, algorithm=ALGORITHM)
             return token
