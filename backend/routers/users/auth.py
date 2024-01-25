@@ -84,14 +84,15 @@ class Auth:
             detail="Invalid credentials",
         )
     
-    def salt_hash_pwd(pwd: str):
+    def salt_hash_pwd(self, pwd: str):
         bytes = pwd.encode('utf-8')
         salt = bcrypt.gensalt()
-        return bcrypt.hashpw(bytes, salt)
+        return bcrypt.hashpw(bytes, salt).decode('utf-8')
     
-    def check_hashed_pwd(hashed: str, pwd: str):
+    def check_hashed_pwd(self, hashed: str, pwd: str):
         pwdBytes = pwd.encode('utf-8')
-        return bcrypt.checkpw(pwdBytes, hashed)
+        hashed_bytes = hashed.encode('utf-8')
+        return bcrypt.checkpw(pwdBytes, hashed_bytes)
     
     def check_login(self, request: Request) -> TokenData:
         token = request.cookies.get("auth")

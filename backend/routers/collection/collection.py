@@ -2,7 +2,7 @@ from fastapi import Depends, UploadFile, File
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, Request
 from ..users.auth import Auth
-from helpers import get_collection, get_collection_path
+from .helpers import get_collection, get_collection_path
 import os
 
 router = APIRouter()
