@@ -1,8 +1,9 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, Request
 from jose import JWTError, jwt
 import sqlite3
 import bcrypt
 import os
+import uuid
 
 SECRET_KEY = "your-secret-key"  # Replace with a secure secret key
 ALGORITHM = "HS256"
@@ -11,6 +12,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 120
 class TokenData:
     def __init__(self, username: str = None):
         self.username = username
+        self.session_id = str(uuid.uuid4)
 
 class User:
     username: str
@@ -60,7 +62,6 @@ class Auth:
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
         )
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -81,7 +82,6 @@ class Auth:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",
-            headers={"WWW-Authenticate": "Bearer"},
         )
     
     def salt_hash_pwd(pwd: str):
@@ -92,3 +92,12 @@ class Auth:
     def check_hashed_pwd(hashed: str, pwd: str):
         pwdBytes = pwd.encode('utf-8')
         return bcrypt.checkpw(pwdBytes, hashed)
+    
+    def check_login(self, request: Request) -> TokenData:
+        token = request.cookies.get("auth")
+        if token is not None:
+            token_data = self.verify_token(token)
+            return token_data
+        
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials")
