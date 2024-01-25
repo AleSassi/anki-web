@@ -10,7 +10,7 @@ router = APIRouter()
 prefix_route = "/api/deck/overview"
 
 @router.get(prefix_route)
-async def collection_get(request: Request):
+async def overview_get(request: Request):
 	auth = Auth()
 	#Check authentication
 	token_data = auth.check_login(request)
