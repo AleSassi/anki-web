@@ -30,17 +30,6 @@ class RESTCollectionStats:
 
     def report_data(self, period: int = PERIOD_MONTH) -> dict:
         self.type = period
-        """
-        txt += self._section(self.todayStats())
-        txt += self._section(self.dueGraph())
-        txt += self.repsGraphs()
-        txt += self._section(self.introductionGraph())
-        txt += self._section(self.ivlGraph())
-        txt += self._section(self.hourGraph())
-        txt += self._section(self.easeGraph())
-        txt += self._section(self.cardGraph())
-        txt += self._section(self.footer())
-        """
         if self.wholeCollection:
             deck = "whole collection"
         else:
