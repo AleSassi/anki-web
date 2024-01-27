@@ -3,7 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi import APIRouter, Request
 from ..users.auth import Auth
 from ..collection.helpers import get_collection, get_collection_path
-from stats_builder import RESTCollectionStats, PERIOD_LIFE, PERIOD_MONTH, PERIOD_YEAR
+from .stats_builder import RESTCollectionStats, PERIOD_LIFE, PERIOD_MONTH, PERIOD_YEAR
 import os
 
 router = APIRouter()
