@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from routers.users import login, logout, signup
 from routers.collection import collection
-from routers.deck import overview, stats, options, create
+from routers.deck import overview, stats, options, create, study
 
 backend = FastAPI()
 
@@ -13,6 +13,7 @@ backend.include_router(overview.router)
 backend.include_router(stats.router)
 backend.include_router(options.router)
 backend.include_router(create.router)
+backend.include_router(study.router)
 
 @backend.get("/api")
 def test():
