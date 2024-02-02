@@ -14,16 +14,33 @@ async def signup_post(request: Request):
 
     request_json = await request.json()
     if "username" not in request_json or not request_json['username']:
-        return JSONResponse({"status": 500, "Message": "Username is missing"})
+        raise HTTPException(
+            status_code=500,
+            detail="Username is missing",
+        )
     elif "password" not in request_json or not request_json['password']:
-        return JSONResponse({"status": 500, "Message": "Password is missing"})
+        raise HTTPException(
+            status_code=500,
+            detail="Password is missing",
+        )
 
     username = request_json['username']
     password = request_json['password']
+    if len(username) == 0 or len(password) == 0:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid credentials",
+        )
     if auth.get_user(username):
-        return {"status": 500, "message": "Username already exists"}
+        raise HTTPException(
+            status_code=500,
+            detail="Username already exists",
+        )
     elif len(password) < 8:
-        return {"status": 500, "message": "Password must be >= 8 chars long"}
+        raise HTTPException(
+            status_code=500,
+            detail="Password must be >= 8 chars long",
+        )
 
     auth.add_user(username, password)
     return {"status": 200, "message": "Signup successful"}

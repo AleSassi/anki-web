@@ -1,1 +1,0 @@
-curl --header "Content-Type: application/json" --request $1 --data $2 "http://localhost:3000/backend/$3"
