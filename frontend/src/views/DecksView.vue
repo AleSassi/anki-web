@@ -27,7 +27,6 @@ onMounted(async () => {
 
 <template>
     <NavBar active_index="0" />
-
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-6 col-md-12 order-md-3">
