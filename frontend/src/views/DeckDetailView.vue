@@ -1,0 +1,103 @@
+<script setup lang="ts">
+import TextField from '../components/TextField.vue'
+import NavBar from '@/components/NavBar.vue';
+import logoURL from '../assets/logo.svg'
+import AuthController from '../controllers/auth_controller'
+import { ref, computed } from "vue";
+import router from "@/router/index";
+import RoutingPath from "@/router/routing_path";
+import HomeController from '@/controllers/home_controller';
+import DeckList from '@/components/DeckList.vue';
+import DeckEntry from '@/components/DeckEntry.vue';
+import { onMounted } from 'vue';
+import { CollectionData } from '@/model/collection_model';
+import DeckDetailContainer from '@/components/DeckDetailContainer.vue';
+
+const deckData = HomeController.getOpenDeck();
+
+onMounted(async () => {
+	if (deckData.value == null) {
+		router.replace(RoutingPath.HOME);
+	}
+})
+
+const deckFinished = computed(() => {
+	return deckData.value?.due_cards == 0 && deckData.value?.lrn_cards == 0 && deckData.value?.new_cards == 0
+})
+
+function study() {
+	router.replace(RoutingPath.DECK_STUDY);
+}
+
+function browse() {
+	router.replace(RoutingPath.DECK_BROWSE);
+}
+
+function stats() {
+	router.replace(RoutingPath.DECK_STATS);
+}
+
+function settings() {
+	router.replace(RoutingPath.DECK_SETTINGS);
+}
+
+function add_cards() {
+	router.replace(RoutingPath.DECK_ADD_CARDS);
+}
+
+function home() {
+	HomeController.closeDeck();
+	router.replace(RoutingPath.HOME);
+}
+
+</script>
+
+<template>
+	<NavBar active_index="-1" />
+	<div class="container">
+		<div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
+			<div class="col-lg-6 col-md-12 order-md-3">
+				<div><h2>{{ deckData?.name }}</h2></div>
+				<div><div class="mb-2"></div></div>
+				
+				<div v-if="deckFinished">
+					<div class="mb-2">
+						<b>Congratulations! Today's portion of the deck has been completed.</b>
+					</div>
+					<div class="form-actions mb-2">
+						<button id="study_button" @click="home" class="btn btn-primary rounded mx-3 my-2 d-inline-block">Home</button>
+						<button id="browse_button" @click="browse" class="btn btn-secondary rounded mx-3 my-2 d-inline-block" type="button">Browse</button>
+						<button id="stats_button" @click="stats" class="btn btn-secondary rounded mx-3 my-2 d-inline-block" type="button">Stats</button>
+						<button id="settings_button" @click="settings" class="btn btn-info rounded mx-3 my-2 d-inline-block">Settings</button>
+						<button id="add_button" @click="add_cards" class="btn btn-success rounded mx-3 my-2 d-inline-block" type="button">Add Cards</button>
+					</div>
+			  	</div>
+				<div v-if="!deckFinished" class="my-3">
+					<div class="form-actions mb-2">
+						<button id="study_button" @click="study" class="btn btn-primary rounded mx-3 my-2 d-inline-block">Start</button>
+						<button id="browse_button" @click="browse" class="btn btn-secondary rounded mx-3 my-2 d-inline-block" type="button">Browse</button>
+						<button id="stats_button" @click="stats" class="btn btn-secondary rounded mx-3 my-2 d-inline-block" type="button">Stats</button>
+						<button id="settings_button" @click="settings" class="btn btn-info rounded mx-3 my-2 d-inline-block">Settings</button>
+						<button id="add_button" @click="add_cards" class="btn btn-success rounded mx-3 my-2 d-inline-block" type="button">Add Cards</button>
+					</div>
+				</div>
+
+				<DeckDetailContainer v-if="!deckFinished" />
+			</div>
+		
+			<div class="col-md-1 order-md-1 d-none d-lg-block">
+			</div>
+			<div class="col-md-2 order-md-2 d-none d-lg-block">
+			</div>
+
+			<div class="col-md-3 mt-1 order-md-4">
+			</div>
+		</div>
+	</div>
+</template>
+
+<style scoped>
+#form-container {
+	height: 100%;
+}
+</style>

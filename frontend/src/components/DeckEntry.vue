@@ -1,5 +1,5 @@
 <template>
-    <li class="rounded mb-2 list-group-item list-group-item-action d-flex justify-content-between align-items-center" :click="openDeck()">
+    <li class="rounded mb-2 list-group-item list-group-item-action d-flex justify-content-between align-items-center" @click="openDeck">
         <span class="fw-medium">{{ props.title }}</span>
         <span>
             <span class="badge text-bg-primary rounded-pill mx-05">{{ props.lrn_count }}</span>
@@ -17,6 +17,7 @@ import { onMounted, ref, watch } from 'vue';
 import { computed } from 'vue';
 import type { DeckData } from '@/model/collection_model';
 import DeckList from './DeckList.vue';
+import HomeController from '@/controllers/home_controller';
 
 interface Props {
     title: string;
@@ -39,6 +40,8 @@ onMounted(() => {
 
 function openDeck() {
     let did = props.deck_id;
+    HomeController.openDeck(did);
+    router.replace(RoutingPath.DECK_DETAIL);
 }
 
 </script>

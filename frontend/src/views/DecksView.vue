@@ -30,7 +30,7 @@ onMounted(async () => {
     <div class="container-fluid">
         <div class="row">
             <div class="col-lg-6 col-md-12 order-md-3">
-                <p v-if="loading" class="text-secondary text-center">Loading collection</p>
+                <p v-if="loading" class="text-secondary text-center">Loading collection...</p>
                 <DeckList ref="deckList"/>
                 <p class="text-center text-secondary pt-3" v-if="deckData && deckData.studiedTime > 0">It took {{ deckData?.studiedTime ?? 0 }} seconds to learn {{ deckData?.studiedCards ?? 0 }} cards today.</p>
                 <p class="text-center text-secondary pt-3" v-if="!deckData || (deckData?.studiedTime ?? 0) == 0">You haven't studied anything today!</p>

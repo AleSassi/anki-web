@@ -19,6 +19,14 @@ const router = createRouter({
       },
     },
     {
+      path: RoutingPath.DECK_DETAIL,
+      name: "deck/detail",
+      component: () => import("../views/DeckDetailView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
       path: RoutingPath.AUTH,
       name: "auth",
       component: () => import("../views/LoginView.vue"),
@@ -34,7 +42,7 @@ const router = createRouter({
 /// Router guard to check if user is authenticated
 router.beforeEach((to, from, next) => {
   let isAuthenticated = AuthController.isAuthenticated.value;
-  if (to.meta.requireAuth && !isAuthenticated) return next("/login");
+  if (to.meta.requireAuth && !isAuthenticated) return next(RoutingPath.AUTH);
   if (to.name === "login" && isAuthenticated) return next(RoutingPath.HOME);
   return next();
 });
