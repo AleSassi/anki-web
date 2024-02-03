@@ -10,6 +10,7 @@ interface IHomeController {
     openDeck(did: number): void;
     closeDeck(): void;
     getOpenDeck(): Ref<DeckData | null>;
+    getOpenDeckID(): number;
     getDecks(): Promise<CollectionData | null>;
     setCollection(newCollection: CollectionData | null): void;
 }
@@ -40,6 +41,10 @@ export class HomeController extends BaseController<CollectionData | null> implem
         }
 
         return openDeckRef;
+    }
+
+    getOpenDeckID(): number {
+        return JSON.parse(localStorage.getItem("openDeck") ?? '{"did": -1}').did;
     }
 
     closeDeck() {

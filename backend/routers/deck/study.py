@@ -1,6 +1,7 @@
 from typing import Any
 from fastapi import Depends, UploadFile, File
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import HTTPException
 from fastapi import APIRouter, Request
 from ..users.auth import Auth
 from ..users.session import SessionStorage
@@ -23,12 +24,12 @@ async def study_get(request: Request):
 	#Check authentication
 	token_data = auth.check_login(request)
 	#We are authenticated - return the list of decks
-
-	request_body = await request.json()
-	if "deck_id" not in request_body or request_body["deck_id"] is None or type(request_body["deck_id"]) is not int:
-		return JSONResponse({"status": 500, "message": "Missing deck ID"}, status_code=500)
 	
-	deck_id = request_body["deck_id"]
+	request_body = request.query_params
+	if request_body.get("deck_id") is None:
+		raise HTTPException(status_code=500, detail="Missing deck ID")
+	
+	deck_id = int(request_body.get("deck_id"))
 	col = get_collection(token_data)
 	resp_data = {
 		"status": 200,
@@ -41,9 +42,9 @@ async def study_get(request: Request):
 		col.reset()
 		card = col.sched.getCard()
 		if card is None:
-			resp_data = {
-				"status": 302,
-				"message": "No cards to study"
+			col.close()
+			return {
+				"finished": True
 			}
 		else:
 			question = card.question()
@@ -113,8 +114,8 @@ async def study_get(request: Request):
 					"interval": btn[2]
 				})
 			resp_data = {
-				"status": 200,
-				"data": {
+				"finished": False,
+				"card_data": {
 					"question": {
 						"html_text": question,
 						"sounds": question_sound_list
@@ -126,7 +127,7 @@ async def study_get(request: Request):
 					"buttons": btn_list_json,
 					"card_type": cardType,
 					"counts": {
-						"new": newCount,
+						"unseen": newCount,
 						"learning": lrnCount,
 						"revising": revCount
 					}
@@ -145,18 +146,15 @@ async def study_post(request: Request):
 
 	request_body = await request.json()
 	if "deck_id" not in request_body or request_body["deck_id"] is None or type(request_body["deck_id"]) is not int:
-		return JSONResponse({"status": 500, "message": "Missing deck ID"}, status_code=500)
+		raise HTTPException(status_code=500, detail="Missing deck ID")
 	if "answer_id" not in request_body or request_body["answer_id"] is None or type(request_body["answer_id"]) is not int:
-		return JSONResponse({"status": 500, "message": "Missing answer ID"}, status_code=500)
+		raise HTTPException(status_code=500, detail="Missing answer ID")
 	
 	deck_id = request_body["deck_id"]
 	answer_id = request_body["answer_id"]
 	col = get_collection(token_data)
 	resp_data = {
-		"status": 200,
-		"data": {
-			"answered": False
-		}
+		"answered": False
 	}
 
 	if col is not None:
@@ -165,10 +163,7 @@ async def study_post(request: Request):
 		col.reset()
 		activeCard = SessionStorage.get(token_data.session_id, "_active_card")
 		if activeCard is None:
-			resp_data = {
-				"status": 500,
-				"message": "No active card"
-			}
+			raise HTTPException(status_code=500, detail="No active card")
 		else:
 			activeCard.col = col
 			activeCard.note().col = col
@@ -177,10 +172,7 @@ async def study_post(request: Request):
 			col.close()
 			SessionStorage.set(token_data.session_id, "_answer_card", None)
 			resp_data = {
-				"status": 200,
-				"data": {
-					"answered", True
-				}
+				"answered": True
 			}
 	
 	return JSONResponse(resp_data)

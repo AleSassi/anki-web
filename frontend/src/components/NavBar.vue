@@ -1,5 +1,5 @@
 <template>
-    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
+    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom bg-body">
         <div class="col-md-3 mb-2 mb-md-0">
         </div>
 
@@ -45,3 +45,9 @@ function getStyle(idx: number): string {
     return "nav-link px-2" + (parseInt(props.active_index) == idx ? " link-secondary" : "")
 }
 </script>
+
+<style scoped>
+.bg-nav-bar {
+    background-color: #1E2952;
+}
+</style>

@@ -27,6 +27,14 @@ const router = createRouter({
       },
     },
     {
+      path: RoutingPath.DECK_STUDY,
+      name: "deck/study",
+      component: () => import("../views/StudyView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
       path: RoutingPath.AUTH,
       name: "auth",
       component: () => import("../views/LoginView.vue"),
