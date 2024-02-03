@@ -2,8 +2,8 @@
 * Adapted from https://github.com/PrivTap/PrivTap
 */
 
-import type { BaseResponse } from "../model/response_model";
-import type { UserModel } from "../model/user_model";
+import type { DatalessResponse } from "../model/dataless_resp_model";
+import { UserModel } from "../model/user_model";
 import { computed, ref, type Ref } from "vue";
 import { BaseController } from "./base_controller";
 
@@ -25,12 +25,18 @@ export class AuthController extends BaseController<UserModel | null> implements 
             username: username,
             password: password,
         };
-        const res = await super.post<UserModel>(
+        const res = await super.post<DatalessResponse>(
             "/login",
             { body: body, message: "Login Successful!" }
         );
-        this.setUser(res);
-        return res;
+        console.log(res)
+        if (res) {
+            let umodel = new UserModel(username, password);
+            this.setUser(umodel);
+            console.log(reference.value);
+            return umodel
+        }
+        return null;
     }
 
     async logout(): Promise<boolean> {

@@ -1,5 +1,6 @@
 from fastapi import Depends, UploadFile, File
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import HTTPException
 from fastapi import APIRouter, Request
 from ..users.auth import Auth
 from .helpers import get_collection, get_collection_path
@@ -18,8 +19,9 @@ def collection_get(request: Request):
     
 	col = get_collection(token_data)
 	resp_data = {
-		"status": 200,
-		"data": {}
+		"decks": [],
+		"studiedCards": 0,
+		"studiedTime": 0
 	}
 	if col is not None:
 		dueTree = col.sched.deckDueTree()
@@ -34,12 +36,10 @@ def collection_get(request: Request):
 			studiedTime = 0
 		
 		resp_data = {
-			"status": 200,
-			"data": {
-				"decks": deck_list,
-				"studiedCards": cards,
-				"studiedTime": studiedTime
-			}}
+			"decks": deck_list,
+			"studiedCards": cards,
+			"studiedTime": studiedTime
+		}
 	
 	resp =  JSONResponse(resp_data)
 	return resp
@@ -60,15 +60,15 @@ def collection_put(request: Request, file: UploadFile = File(...)):
 			#Check that the file being written is an Anki collection
 			is_sqlite = isSQLite3(coll_path)
 	except Exception:
-		return JSONResponse({"message": "There was an error uploading the file"}, status_code=500)
+		raise HTTPException(status_code=500, detail="There was an error uploading the file")
 	finally:
 		file.file.close()
 	 
 	if not is_sqlite:
 		os.remove(coll_path)
-		return JSONResponse({"message": "File is not an Anki collection database"}, status_code=500)
+		raise HTTPException(status_code=500, detail="File is not an Anki collection database")
 	
-	return JSONResponse({"message": f"Successfully uploaded collection '{file.filename}'"})
+	return JSONResponse({"status": 200, "message": f"Successfully uploaded collection '{file.filename}'"})
 
 def build_deck_list(decks: list) -> [dict]:
 	deck_list = []
@@ -76,7 +76,7 @@ def build_deck_list(decks: list) -> [dict]:
 		name, did, due, lrn, new, children = node
 		if did == 1:
 			continue
-		deck_list.append({'name': name, 'did': did, 'new': new, 'due': due, 'lrn': lrn, 'children': build_deck_list(children)})
+		deck_list.append({'name': name, 'did': did, 'new_cards': new, 'due_cards': due, 'lrn_cards': lrn, 'children': build_deck_list(children)})
 	return deck_list
 
 def isSQLite3(filename):

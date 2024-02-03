@@ -21,11 +21,10 @@ export abstract class BaseController<T> {
      */
     protected async get<T>(path: string, config?: { query?: object, headers?: object, message?: string }): Promise<T | null> {
         try {
-            console.log("Getting from ", path)
             const res = await axiosInstance.get(path, { params: config?.query, headers: config?.headers });
             if (config?.message != undefined)
                 useToast().success(config.message);
-            return res.data.data as T;
+            return res.data as T;
         } catch (error) {
             axiosCatch(error);
             return null;
@@ -45,11 +44,10 @@ export abstract class BaseController<T> {
 
     protected async post<T>(path: string, config?: { body?: object, message?: string }): Promise<T | null> {
         try {
-            console.log("Positng ", config?.body, " to ", path)
             const res = await axiosInstance.post(path, config?.body);
             if (config?.message != undefined)
                 useToast().success(config.message);
-            return res.data.data as T;
+            return res.data as T;
         } catch (error) {
             axiosCatch(error);
             return null;
@@ -57,11 +55,10 @@ export abstract class BaseController<T> {
     }
     protected async put<T>(path: string, config?: { body?: object, message?: string }): Promise<T | null> {
         try {
-            console.log("Putting ", config?.body, " to ", path)
             const res = await axiosInstance.put(path, config?.body);
             if (config?.message != undefined)
                 useToast().success(config.message);
-            return res.data.data as T;
+            return res.data as T;
         } catch (error) {
             axiosCatch(error);
             return null;
