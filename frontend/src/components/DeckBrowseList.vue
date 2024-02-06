@@ -1,6 +1,6 @@
 <template>
     <ul class="list-group">
-        <DeckBrowseEntry v-for="card in displayedData" :title="card.note?.fields.value ?? 'undefined'" :card_id="card.id" :card_type="card.type"
+        <DeckBrowseEntry v-for="card in displayedData" :title="card.note?.fields[0].value ?? 'undefined'" :card_id="card.id" :card_type="card.type"
             :card_state="card.ord" />
     </ul>
 </template>
