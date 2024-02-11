@@ -35,7 +35,7 @@ onMounted(() => {
 function openCard() {
     let cid = props.card_id;
     DeckBrowseController.openCard(cid);
-    //router.replace(RoutingPath.DECK_DETAIL);
+    router.replace(RoutingPath.CARD_DETAIL);
 }
 
 </script>

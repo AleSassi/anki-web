@@ -1,4 +1,4 @@
-import type { DatalessResponse } from "../model/dataless_resp_model";
+import { DatalessResponse } from "../model/dataless_resp_model";
 import { CollectionData, DeckData } from "../model/collection_model";
 import { computed, ref, type Ref } from "vue";
 import { BaseController } from "./base_controller";
@@ -33,6 +33,36 @@ export class DeckBrowseController extends BaseController<DeckBrowseResponse | nu
             return res;
         }
         return null;
+    }
+
+    async editOpenCard(data: { [id: string]: string }): Promise<boolean> {
+        let fields: NoteFieldData[] = [];
+        for (const field of openCardRef.value?.note?.fields ?? []) {
+            fields.push(new NoteFieldData(field.name, data[field.name]));
+        }
+        let post_body = {
+            card_id: openCardId,
+            fields: fields
+        }
+        const res = await super.post<DatalessResponse>("/cards", {
+            body: post_body,
+            message: "Card edited successfully"
+        });
+        if (res) {
+            return true;
+        }
+        return false;
+    }
+
+    async deleteOpenCard(): Promise<boolean> {
+        let post_body = {
+            card_ids: [openCardId]
+        }
+        const res = await super.delete("/cards", {
+            body: post_body,
+            message: "Card deleted successfully"
+        });
+        return res;
     }
 
     openCard(cid: number): void {

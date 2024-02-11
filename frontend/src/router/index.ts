@@ -43,6 +43,14 @@ const router = createRouter({
       },
     },
     {
+      path: RoutingPath.CARD_DETAIL,
+      name: "card",
+      component: () => import("../views/CardDetailView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
       path: RoutingPath.AUTH,
       name: "auth",
       component: () => import("../views/LoginView.vue"),

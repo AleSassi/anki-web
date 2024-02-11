@@ -8,4 +8,5 @@ export default class RoutingPath {
     static readonly DECK_SETTINGS = "/deck/settings";
     static readonly DECK_STATS = "/deck/stats";
     static readonly DECK_ADD_CARDS = "/deck/cards/add";
+    static readonly CARD_DETAIL = "/card";
 }

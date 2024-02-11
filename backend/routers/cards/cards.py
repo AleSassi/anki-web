@@ -2,6 +2,7 @@ from typing import Any
 from fastapi import Depends, UploadFile, File
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, Request
+from fastapi.exceptions import HTTPException
 from ..users.auth import Auth
 from ..collection.helpers import get_collection, get_collection_path
 import os
@@ -19,9 +20,9 @@ async def card_post(request: Request):
 
 	request_body: dict = await request.json()
 	if "card_id" not in request_body or request_body["card_id"] is None or type(request_body["card_id"]) is not int:
-		return JSONResponse({"status": 500, "message": "Missing card ID"}, status_code=500)
-	if "fields" not in request_body or request_body["fields"] is None or type(request_body["fields"]) is not list[dict]:
-		return JSONResponse({"status": 500, "message": "Missing new data for card fields"}, status_code=500)
+		raise HTTPException(status_code=500, detail="Missing card ID")
+	if "fields" not in request_body or request_body["fields"] is None or type(request_body["fields"]) is not list:
+		raise HTTPException(status_code=500, detail="Missing new data for card fields")
 	
 	cid = request_body['card_id']
 	fields: list[dict] = request_body["fields"]
@@ -34,9 +35,14 @@ async def card_post(request: Request):
 	if col is not None:
 		card = col.get_card(int(cid))
 		note = card.note()
-		fields = note.items()
-		for field in fields:
-			newVal = request_body.get(field[0])
+		note_fields = note.items()
+		for field in note_fields:
+			newVal: str = None
+			for req_fields in fields:
+				if req_fields.get("name") == field[0]:
+					newVal = req_fields.get("value")
+					break
+			
 			if newVal is not None and type(newVal) is type(note[field[0]]):
 				note[field[0]] = newVal
 		col.update_note(note)
@@ -54,11 +60,11 @@ async def card_put(request: Request):
 
 	request_body: dict = await request.json()
 	if "deck_id" not in request_body or request_body["deck_id"] is None or type(request_body["deck_id"]) is not int:
-		return JSONResponse({"status": 500, "message": "Missing parent deck ID"}, status_code=500)
+		raise HTTPException(status_code=500, detail="Missing parent deck ID")
 	if "model_id" not in request_body or request_body["model_id"] is None or type(request_body["model_id"]) is not int:
-		return JSONResponse({"status": 500, "message": "Missing model ID for card"}, status_code=500)
+		raise HTTPException(status_code=500, detail="Missing model ID for card")
 	if "fields" not in request_body or request_body["fields"] is None or type(request_body["fields"]) is not list[dict]:
-		return JSONResponse({"status": 500, "message": "Missing new data for card fields"}, status_code=500)
+		raise HTTPException(status_code=500, detail="Missing new data for card fields")
 	
 	did = request_body['deck_id']
 	fields: list[dict] = request_body["fields"]
@@ -73,7 +79,7 @@ async def card_put(request: Request):
 		col.decks.select(int(did))
 		model = col.models.get(model_id)
 		if model is None:
-			return JSONResponse({"status": 500, "message": "No model with given ID was found"}, status_code=500)
+			raise HTTPException(status_code=500, detail="No model with given ID was found")
 		model_fields: list[dict] = model["flds"]
 		model_fields.sort(key=lambda field: field["ord"])
 		note = col.new_note({"id": model["id"]})
@@ -105,8 +111,8 @@ async def card_delete(request: Request):
 	#We are authenticated - return the list of decks
 
 	request_body: dict = await request.json()
-	if "card_ids" not in request_body or request_body["card_ids"] is None or type(request_body["card_ids"]) is not list[int]:
-		return JSONResponse({"status": 500, "message": "Missing card ID"}, status_code=500)
+	if "card_ids" not in request_body or request_body["card_ids"] is None or type(request_body["card_ids"]) is not list:
+		raise HTTPException(status_code=500, detail="Missing card ID")
 	
 	cid: list[int] = request_body['card_ids']
 	col = get_collection(token_data)
