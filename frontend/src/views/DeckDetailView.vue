@@ -12,7 +12,11 @@ import DeckEntry from '@/components/DeckEntry.vue';
 import { onMounted } from 'vue';
 import { CollectionData } from '@/model/collection_model';
 import DeckDetailContainer from '@/components/DeckDetailContainer.vue';
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/css/index.css';
+import { useToast } from 'vue-toastification';
 
+const loadingRef = ref(false);
 const deckData = HomeController.getOpenDeck();
 
 onMounted(async () => {
@@ -45,6 +49,21 @@ function add_cards() {
 	router.replace(RoutingPath.DECK_ADD_CARDS);
 }
 
+async function delete_deck() {
+	loadingRef.value = true;
+	if (deckData.value == null) {
+		router.replace(RoutingPath.HOME);
+		useToast().error("No open deck was found");
+		return;
+	}
+
+	const res = await HomeController.deleteDeck(deckData.value.did);
+	if (res) {
+		router.replace(RoutingPath.HOME);
+	}
+	loadingRef.value = false;
+}
+
 function home() {
 	HomeController.closeDeck();
 	router.replace(RoutingPath.HOME);
@@ -54,6 +73,7 @@ function home() {
 
 <template>
 	<NavBar active_index="-1" />
+	<loading v-model:active="loadingRef" :can-cancel="false" :is-full-page="true"/>
 	<div class="container">
 		<div class="row row-cols-1 row-cols-md-3 mb-3 text-center">
 			<div class="col-lg-6 col-md-12 order-md-3">
@@ -70,6 +90,7 @@ function home() {
 						<button id="stats_button" @click="stats" class="btn btn-secondary rounded mx-3 my-2 d-inline-block" type="button">Stats</button>
 						<button id="settings_button" @click="settings" class="btn btn-info rounded mx-3 my-2 d-inline-block">Settings</button>
 						<button id="add_button" @click="add_cards" class="btn btn-success rounded mx-3 my-2 d-inline-block" type="button">Add Cards</button>
+						<button id="del_button" @click="delete_deck" class="btn btn-danger rounded mx-3 my-2 d-inline-block" type="button">Delete Deck</button>
 					</div>
 			  	</div>
 				<div v-if="!deckFinished" class="my-3">
@@ -78,7 +99,7 @@ function home() {
 						<button id="browse_button" @click="browse" class="btn btn-secondary rounded mx-3 my-2 d-inline-block" type="button">Browse</button>
 						<button id="stats_button" @click="stats" class="btn btn-secondary rounded mx-3 my-2 d-inline-block" type="button">Stats</button>
 						<button id="settings_button" @click="settings" class="btn btn-info rounded mx-3 my-2 d-inline-block">Settings</button>
-						<button id="add_button" @click="add_cards" class="btn btn-success rounded mx-3 my-2 d-inline-block" type="button">Add Cards</button>
+						<button id="del_button" @click="delete_deck" class="btn btn-danger rounded mx-3 my-2 d-inline-block" type="button">Delete Deck</button>
 					</div>
 				</div>
 

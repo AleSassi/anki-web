@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import HTTPException
 from routers.users import login, logout, signup
 from routers.collection import collection
-from routers.deck import overview, stats, options, create, study, custom_study
+from routers.deck import overview, stats, options, create, study, custom_study, deck
 from routers.deck import cards as deck_cards
 from routers.collection.models import models, fields
 from routers.cards import cards, import_file
@@ -97,6 +97,7 @@ backend.include_router(models.router)
 backend.include_router(fields.router)
 backend.include_router(import_file.router)
 backend.include_router(cards.router)
+backend.include_router(deck.router)
 
 @backend.get("/api")
 def test():

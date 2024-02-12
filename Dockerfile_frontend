@@ -17,12 +17,20 @@ RUN mkdir /app
 RUN chmod 777 /app
 WORKDIR /app
 
-RUN echo "Copying frontend files"
-ADD ./frontend ./frontend
-
 RUN echo "Downloading Node dependencies"
+RUN mkdir /app/frontend
 WORKDIR /app/frontend
+ADD ./frontend/package.json ./
+ADD ./frontend/package-lock.json ./
 RUN npm install
+
+RUN echo "Copying frontend files"
+ADD ./frontend/public ./public
+ADD ./frontend/src ./src
+ADD ./frontend/*.json ./
+ADD ./frontend/index.html ./
+ADD ./frontend/*.ts ./
+ADD ./frontend/.env ./
 
 # Setup default command and/or parameters.
 EXPOSE 5173

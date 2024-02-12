@@ -10,6 +10,7 @@ interface IHomeController {
     openDeck(did: number): void;
     closeDeck(): void;
     createDeck(name: string): Promise<boolean>;
+    deleteDeck(did: number): Promise<boolean>;
     uploadCollection(file: File): Promise<boolean>;
     getOpenDeck(): Ref<DeckData | null>;
     getOpenDeckID(): number;
@@ -58,6 +59,16 @@ export class HomeController extends BaseController<CollectionData | null> implem
             return true;
         }
         return false;
+    }
+
+    async deleteDeck(did: number): Promise<boolean> {
+        const res = await super.delete("/deck", {
+            body: {
+                deck_id: did
+            },
+            message: "Deck deleted successfully"
+        });
+        return res;
     }
 
     openDeck(did: number): void {

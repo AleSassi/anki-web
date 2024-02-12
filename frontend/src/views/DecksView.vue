@@ -14,6 +14,7 @@ import { CollectionData } from '@/model/collection_model';
 import Loading from 'vue-loading-overlay';
 import 'vue-loading-overlay/dist/css/index.css';
 
+
 const deckData = HomeController.getRef();
 const deckList = ref<InstanceType<typeof DeckList> | null>(null);
 const loadingRef = ref(true);
