@@ -25,7 +25,9 @@ const deckData = HomeController.getOpenDeck();
 const modelListDataRef = ModelController.getRef();
 const selectedModelID = ref<number | null>(null);
 const modelData = ref<ModelResponse | null>(null);
+const uploadsFile = ref(false);
 const loadingRef = ref(true);
+const file = ref<File | null>();
 
 let fieldHashMap = ref<{ [id: string]: string }>({});
 
@@ -45,6 +47,13 @@ onMounted(async () => {
     loadingRef.value = false;
 })
 
+function onFileChanged($event: Event) {
+    const target = $event.target as HTMLInputElement;
+    if (target && target.files) {
+        file.value = target.files[0];
+    }
+}
+
 async function onSubmitted(event: Event) {
     loadingRef.value = true;
     if (event) {
@@ -53,13 +62,21 @@ async function onSubmitted(event: Event) {
 
     if (deckData.value?.did && selectedModelID.value) {
         const res = await CardAddController.addCard(deckData.value.did, selectedModelID.value, fieldHashMap.value);
-        for (let i = 0; i < (modelData.value?.model.flds ?? []).length; i++) {
-            const element = modelData.value?.model.flds[i];
-            if (element) {
-                fieldHashMap.value[element.name] = "";
-            }
-        }
     }
+    resetForm();
+    loadingRef.value = false;
+}
+
+async function onSubmittedFile(event: Event) {
+    loadingRef.value = true;
+    if (event) {
+        event.preventDefault();
+    }
+
+    if (deckData.value?.did && selectedModelID.value && file.value) {
+        const res = await CardAddController.uploadFile(deckData.value.did, selectedModelID.value, file.value);
+    }
+    resetForm();
     loadingRef.value = false;
 }
 
@@ -87,6 +104,14 @@ async function onModelSelection(event: Event) {
     loadingRef.value = false;
 }
 
+function resetForm() {
+    selectedModelID.value = null;
+    modelData.value = null;
+    uploadsFile.value = false;
+    file.value = null;
+    fieldHashMap.value = {};
+}
+
 </script>
 
 <template>
@@ -99,18 +124,18 @@ async function onModelSelection(event: Event) {
                 </div>
                 <div class="my-3">
                     <div class="form-actions mb-2">
-                        <button id="study_button" type="submit" @click="router.push(RoutingPath.DECK_BROWSE)"
+                        <button id="study_button" type="submit" @click="router.push(RoutingPath.DECK_DETAIL)"
                             class="btn btn-primary rounded mx-3 d-inline-block">Back</button>
                     </div>
                 </div>
-                <div class="form-check my-3">
-                    <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                    <label class="form-check-label" for="flexCheckDefault">
+                <div class="my-3">
+                    <input class="form-check-input mx-3" type="checkbox" value="" id="flexCheckDefault" v-model="uploadsFile">
+                    <label class="form-check-label text-start" for="flexCheckDefault">
                         Upload from CSV file
                     </label>
                 </div>
-                <form>
-                    <loading v-model:active="loadingRef" :can-cancel="false" :is-full-page="true"/>
+                <loading v-model:active="loadingRef" :can-cancel="false" :is-full-page="true"/>
+                <form v-if="!uploadsFile">
                     <select class="form-select my-3" required @change="onModelSelection($event)" v-model="selectedModelID">
                         <option selected>Select Card Model</option>
                         <option v-for="model in modelListDataRef?.models" :value="model.id">{{ model.name }}</option>
@@ -123,6 +148,22 @@ async function onModelSelection(event: Event) {
                         <div class="form-actions mb-2">
                             <button class="btn btn-primary rounded py-2 mx-3 d-inline-block" type="submit"
                                 @click="onSubmitted($event)" :disabled="!(deckData && selectedModelID)">Add Card</button>
+                        </div>
+                    </div>
+                </form>
+                <form v-if="uploadsFile">
+                    <select class="form-select my-3" required @change="onModelSelection($event)" v-model="selectedModelID">
+                        <option selected>Select Card Model</option>
+                        <option v-for="model in modelListDataRef?.models" :value="model.id">{{ model.name }}</option>
+                    </select>
+                    <div class="mb-3">
+						<label for="formFile" class="form-label">Choose the source file</label>
+						<input class="form-control" type="file" id="formFile" name="formFile" @change="onFileChanged($event)">
+					</div>
+                    <div class="my-3">
+                        <div class="form-actions mb-2">
+                            <button class="btn btn-primary rounded py-2 mx-3 d-inline-block" type="submit"
+                                @click="onSubmittedFile($event)" :disabled="!(deckData && selectedModelID && file)">Upload Cards</button>
                         </div>
                     </div>
                 </form>

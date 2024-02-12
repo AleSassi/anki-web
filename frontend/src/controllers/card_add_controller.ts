@@ -34,18 +34,24 @@ export class CardAddController extends BaseController<DatalessResponse | null> i
         return false;
     }
 
-    async uploadFile(did: number, model_id: number, file: any): Promise<boolean> {
+    async uploadFile(did: number, model_id: number, file: File): Promise<boolean> {
+        console.log(file);
         var formData = new FormData();
-        formData.append("file", file.files[0]);
+        formData.append("file", file);
         // formData.append("document", documentJson); instead of this, use the line below.
-        formData.append("document", JSON.stringify({
+        formData.append("request_body_str", JSON.stringify({
             deck_id: did,
             model_id: model_id
         }));
 
         const res = await super.put<DatalessResponse>("/cards/import-file", {
             body: formData,
-            message: "Cards added successfully"
+            message: "Cards added successfully",
+            config: {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
         })
 
         if (res) {

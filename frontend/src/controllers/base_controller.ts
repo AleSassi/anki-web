@@ -6,6 +6,7 @@ import axiosInstance from "../helpers/axios_service";
 import axiosCatch from "../helpers/axios_catch";
 import { useToast } from "vue-toastification";
 import type Ref from "vue";
+import type { AxiosRequestConfig } from "axios";
 
 
 export abstract class BaseController<T> {
@@ -56,9 +57,9 @@ export abstract class BaseController<T> {
         }
     }
     
-    protected async put<T>(path: string, config?: { body?: object, message?: string }): Promise<T | null> {
+    protected async put<T>(path: string, config?: { body?: object, message?: string, config?: AxiosRequestConfig<object> }): Promise<T | null> {
         try {
-            const res = await axiosInstance.put(path, config?.body);
+            const res = await axiosInstance.put(path, config?.body, config?.config);
             if (config?.message != undefined)
                 useToast().success(config.message);
             return res.data as T;
