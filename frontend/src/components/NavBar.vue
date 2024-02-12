@@ -11,7 +11,7 @@
         </ul>
 
         <div class="col-md-3 text-end">
-            <button type="button" class="btn btn-outline-primary me-2">Logout</button>
+            <button type="button" class="btn btn-outline-primary me-2" @click="onLogout()">Logout</button>
         </div>
     </header>
 </template>
@@ -43,6 +43,13 @@ watch(user, (val) => {
 
 function getStyle(idx: number): string {
     return "nav-link px-2" + (parseInt(props.active_index) == idx ? " link-secondary" : "")
+}
+
+async function onLogout() {
+    const res = await AuthController.logout();
+    if (res) {
+        router.replace(RoutingPath.AUTH);
+    }
 }
 </script>
 

@@ -2,7 +2,7 @@
 * Adapted from https://github.com/PrivTap/PrivTap
 */
 
-import type { DatalessResponse } from "../model/dataless_resp_model";
+import { DatalessResponse } from "../model/dataless_resp_model";
 import { UserModel } from "../model/user_model";
 import { computed, ref, type Ref } from "vue";
 import { BaseController } from "./base_controller";
@@ -40,7 +40,7 @@ export class AuthController extends BaseController<UserModel | null> implements 
     }
 
     async logout(): Promise<boolean> {
-        const res = await super.get("/logout", { message: "Logout Successful!" });
+        const res = await super.post<DatalessResponse>("/logout", { message: "Logout Successful!" });
         this.setUser(null);
         if (res == null) return false;
         return true;
