@@ -51,6 +51,14 @@ const router = createRouter({
       },
     },
     {
+      path: RoutingPath.DECK_ADD_CARDS,
+      name: "deck/cards/add",
+      component: () => import("../views/CardAddView.vue"),
+      meta: {
+        requireAuth: true,
+      },
+    },
+    {
       path: RoutingPath.AUTH,
       name: "auth",
       component: () => import("../views/LoginView.vue"),

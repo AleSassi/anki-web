@@ -70,7 +70,7 @@ def collection_put(request: Request, file: UploadFile = File(...)):
 	
 	return JSONResponse({"status": 200, "message": f"Successfully uploaded collection '{file.filename}'"})
 
-def build_deck_list(decks: list) -> [dict]:
+def build_deck_list(decks: list) -> list[dict]:
 	deck_list = []
 	for node in decks:
 		name, did, due, lrn, new, children = node

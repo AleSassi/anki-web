@@ -63,7 +63,7 @@ async def card_put(request: Request):
 		raise HTTPException(status_code=500, detail="Missing parent deck ID")
 	if "model_id" not in request_body or request_body["model_id"] is None or type(request_body["model_id"]) is not int:
 		raise HTTPException(status_code=500, detail="Missing model ID for card")
-	if "fields" not in request_body or request_body["fields"] is None or type(request_body["fields"]) is not list[dict]:
+	if "fields" not in request_body or request_body["fields"] is None or type(request_body["fields"]) is not list:
 		raise HTTPException(status_code=500, detail="Missing new data for card fields")
 	
 	did = request_body['deck_id']

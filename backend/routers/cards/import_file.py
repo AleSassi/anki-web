@@ -1,7 +1,8 @@
-from typing import Any
-from fastapi import Depends, UploadFile, File
+from typing import Any, Annotated
+from fastapi import Depends, File, Form, UploadFile
 from fastapi.responses import JSONResponse
 from fastapi import APIRouter, Request
+from fastapi.exceptions import HTTPException
 from ..users.auth import Auth
 from ..collection.helpers import get_collection, get_collection_path
 import os, csv
@@ -11,17 +12,16 @@ router = APIRouter()
 prefix_route = "/api/cards/import-file"
 
 @router.put(prefix_route)
-async def card_file_put(request: Request, file: UploadFile = File(...)):
+async def card_file_put(request: Request, file: Annotated[UploadFile, File()], request_body: Annotated[dict, Form()]):
 	auth = Auth()
 	#Check authentication
 	token_data = auth.check_login(request)
 	#We are authenticated - return the list of decks
-
-	request_body: dict = await request.json()
+	
 	if "deck_id" not in request_body or request_body["deck_id"] is None or type(request_body["deck_id"]) is not int:
-		return JSONResponse({"status": 500, "message": "Missing parent deck ID"}, status_code=500)
+		raise HTTPException(status_code=500, detail="Missing parent deck ID")
 	if "model_id" not in request_body or request_body["model_id"] is None or type(request_body["model_id"]) is not int:
-		return JSONResponse({"status": 500, "message": "Missing model ID for cards (the same for all cards)"}, status_code=500)
+		raise HTTPException(status_code=500, detail="Missing model ID for cards (the same for all cards)")
 	
 	did = request_body['deck_id']
 	model_id: int = request_body["model_id"]
@@ -35,7 +35,7 @@ async def card_file_put(request: Request, file: UploadFile = File(...)):
 		col.decks.select(int(did))
 		model = col.models.get(model_id)
 		if model is None:
-			return JSONResponse({"status": 500, "message": "No model with given ID was found"}, status_code=500)
+			raise HTTPException(status_code=500, detail="No model with given ID was found")
 		model_fields: list[dict] = model["flds"]
 		model_fields.sort(key=lambda field: field["ord"])
 		
@@ -53,7 +53,7 @@ async def card_file_put(request: Request, file: UploadFile = File(...)):
 							note.fields[i] = ''
 					col.add_note(note, did)
 		except Exception:
-			return JSONResponse({"message": "There was an error uploading the file"}, status_code=500)
+			raise HTTPException(status_code=500, detail="There was an error uploading the file")
 		finally:
 			file.file.close()
 		

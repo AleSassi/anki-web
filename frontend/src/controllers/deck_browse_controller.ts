@@ -16,6 +16,8 @@ interface IDeckBrowseController {
     getOpenCardID(): number;
     getCards(did: number): Promise<DeckBrowseResponse | null>;
     setCards(newCards: DeckBrowseResponse | null): void;
+    editOpenCard(data: { [id: string]: string }): Promise<boolean>;
+    deleteOpenCard(): Promise<boolean>;
 }
 
 export class DeckBrowseController extends BaseController<DeckBrowseResponse | null> implements IDeckBrowseController {

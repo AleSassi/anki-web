@@ -16,35 +16,34 @@ async def models_get(request: Request):
 	token_data = auth.check_login(request)
 	#We are authenticated - return the list of decks
 
-	request_body = await request.json()
+	request_body = request.query_params
 	all_models = True
 	model_id = 0
-	if "model_id" in request_body and request_body["model_id"] is not None and type(request_body["model_id"]) is int:
+	if request_body.get("model_id") is not None:
 		all_models = False
-		model_id: int = request_body["model_id"]
+		model_id: int = int(request_body.get("model_id"))
 	
 	col = get_collection(token_data)
 	resp_data = {
 		"status": 200,
 		"data": {}
 	}
-
+	
 	if col is not None:
 		if all_models:
 			resp_data = {
-				"status": 200,
-				"data": {
-					"models": col.models.all_names_and_ids()
-				}}
+				"models": [{
+					"id": model.id,
+					"name": model.name
+				} for model in col.models.all_names_and_ids()]
+			}
 		else:
 			resp_data = {
-				"status": 200,
-				"data": {
-					"model": col.models.get(model_id)
-				}}
+				"model": col.models.get(model_id)
+			}
 		col.close()
 	
-	resp =  JSONResponse(resp_data)
+	resp = JSONResponse(resp_data)
 	return resp
 
 @router.post(prefix_route)

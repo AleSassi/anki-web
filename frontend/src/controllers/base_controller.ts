@@ -55,6 +55,7 @@ export abstract class BaseController<T> {
             return null;
         }
     }
+    
     protected async put<T>(path: string, config?: { body?: object, message?: string }): Promise<T | null> {
         try {
             const res = await axiosInstance.put(path, config?.body);
