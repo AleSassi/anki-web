@@ -43,6 +43,7 @@ class Auth:
     def check_create_db(self):
         if not os.path.exists('/app/db'):
             os.makedirs('/app/db')
+        if not os.path.isfile(self.database_path):
             con = sqlite3.connect(self.database_path)
             cur = con.cursor()
             cur.execute("CREATE TABLE users (username varchar(255) PRIMARY KEY, password varchar(255))")

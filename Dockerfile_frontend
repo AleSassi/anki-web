@@ -1,0 +1,29 @@
+FROM ubuntu:latest AS ubuntu-base
+ENV DEBIAN_FRONTEND noninteractive
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Build image with Python and Node.
+FROM ubuntu-base AS ubuntu-with-bash
+
+# Install required tools.
+RUN apt-get -qq update \
+    && apt-get -qq --no-install-recommends install ca-certificates curl \
+    && curl -fsSL https://deb.nodesource.com/setup_21.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get -qq clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir /app
+RUN chmod 777 /app
+WORKDIR /app
+
+RUN echo "Copying frontend files"
+ADD ./frontend ./frontend
+
+RUN echo "Downloading Node dependencies"
+WORKDIR /app/frontend
+RUN npm install
+
+# Setup default command and/or parameters.
+EXPOSE 5173
+CMD ["npm", "run", "dev"]

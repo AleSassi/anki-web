@@ -1,0 +1,32 @@
+FROM ubuntu:latest AS ubuntu-base
+ENV DEBIAN_FRONTEND noninteractive
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# Build image with Python and Node.
+FROM ubuntu-base AS ubuntu-with-bash
+
+# Install required tools.
+RUN apt-get -qq update \
+    && apt-get -qq --no-install-recommends install python3-pip \
+    && apt-get -qq clean \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir /app
+RUN chmod 777 /app
+WORKDIR /app
+
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE 1
+
+ADD requirements.txt /app/requirements.txt
+WORKDIR /app
+RUN pip3 install -r requirements.txt
+
+RUN echo "Copying backend files"
+ADD ./backend ./
+
+WORKDIR /app
+
+# Setup default command and/or parameters.
+EXPOSE 3000
+CMD ["python3", "-m", "uvicorn", "backend:backend", "--port", "3000", "--host", "0.0.0.0"]

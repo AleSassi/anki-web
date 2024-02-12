@@ -1,8 +1,27 @@
 version: '3'
 services:
-  anki-web-django:
-    container_name: anki-web-django
+  ankiweb_fastapi:
+    container_name: ankiweb_fastapi
+    hostname: ankiweb_fastapi
     ports:
-      - "27708:8000"
-    build: './'
-    restart: always
+      - "27709:3000"
+    build:
+      context: ./
+      dockerfile: Dockerfile_backend
+    restart: unless-stopped
+    volumes:
+      - ./data/appdb:/app/db:rw
+      - ./data/users:/app/data:rw
+  ankiweb_vue:
+    container_name: ankiweb_vue
+    ports:
+      - "27708:5173"
+    build:
+      context: ./
+      dockerfile: Dockerfile_frontend
+    restart: unless-stopped
+    depends_on:
+      - ankiweb_fastapi
+    links:
+      - "ankiweb_fastapi:backend"
+  
