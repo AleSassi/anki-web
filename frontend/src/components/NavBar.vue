@@ -4,10 +4,10 @@
         </div>
 
         <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-            <li><a :href="RoutingPath.HOME" :class='getStyle(0)'>Decks</a></li>
-            <li><a :href="RoutingPath.HOME" :class='getStyle(1)'>Add</a></li>
-            <li><a :href="RoutingPath.HOME" :class='getStyle(2)'>Browse</a></li>
-            <li><a :href="RoutingPath.HOME" :class='getStyle(3)'>Stats</a></li>
+            <li><a :href="RoutingPath.HOME" :class='getStyle(0)' @click="$emit('optionSelected', 0)">Decks</a></li>
+            <li><a href="#" :class='getStyle(1)' data-bs-toggle="modal" data-bs-target="#newDeckModal" @click="$emit('optionSelected', 1)">Add</a></li>
+            <li><a :href="RoutingPath.HOME" :class='getStyle(2)' @click="$emit('optionSelected', 2)">Browse</a></li>
+            <li><a :href="RoutingPath.HOME" :class='getStyle(3)' @click="$emit('optionSelected', 3)">Stats</a></li>
         </ul>
 
         <div class="col-md-3 text-end">

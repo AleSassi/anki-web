@@ -9,6 +9,7 @@ let openDeckRef = ref<DeckData | null>(null);
 interface IHomeController {
     openDeck(did: number): void;
     closeDeck(): void;
+    createDeck(name: string): Promise<boolean>;
     getOpenDeck(): Ref<DeckData | null>;
     getOpenDeckID(): number;
     getDecks(): Promise<CollectionData | null>;
@@ -26,6 +27,16 @@ export class HomeController extends BaseController<CollectionData | null> implem
             return res;
         }
         return null;
+    }
+
+    async createDeck(name: string): Promise<boolean> {
+        const res = await super.post<DatalessResponse>("/deck/create", {
+            body: {
+                name: name
+            },
+            message: "Deck created successfully"
+        });
+        return res != null;
     }
 
     openDeck(did: number): void {
