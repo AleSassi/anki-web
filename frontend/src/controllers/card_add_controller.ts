@@ -35,7 +35,6 @@ export class CardAddController extends BaseController<DatalessResponse | null> i
     }
 
     async uploadFile(did: number, model_id: number, file: File): Promise<boolean> {
-        console.log(file);
         var formData = new FormData();
         formData.append("file", file);
         // formData.append("document", documentJson); instead of this, use the line below.

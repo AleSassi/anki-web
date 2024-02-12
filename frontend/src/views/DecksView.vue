@@ -18,6 +18,7 @@ const deckData = HomeController.getRef();
 const deckList = ref<InstanceType<typeof DeckList> | null>(null);
 const loadingRef = ref(true);
 const deckName = ref("");
+const file = ref<File | null>();
 
 onMounted(async () => {
     loadingRef.value = true;
@@ -49,6 +50,37 @@ async function onCreateDeck() {
     }
     loadingRef.value = false;
 }
+
+function onFileChanged($event: Event) {
+    const target = $event.target as HTMLInputElement;
+    if (target && target.files) {
+        file.value = target.files[0];
+    }
+}
+
+async function onSubmittedFile(event: Event) {
+    loadingRef.value = true;
+    if (event) {
+        event.preventDefault();
+    }
+
+    if (file.value) {
+        const res = await HomeController.uploadCollection(file.value);
+        if (res) {
+            const refreshRes = await HomeController.getDecks();
+            if (deckList.value) {
+                deckList.value.displayedData = refreshRes?.decks ?? [];
+            }
+        }
+    }
+    resetForm();
+    loadingRef.value = false;
+}
+
+function resetForm() {
+    file.value = null;
+}
+
 </script>
 
 <template>
@@ -61,6 +93,23 @@ async function onCreateDeck() {
                 <DeckList ref="deckList"/>
                 <p class="text-center text-secondary pt-3" v-if="deckData && deckData.studiedTime > 0">It took {{ deckData?.studiedTime ?? 0 }} seconds to learn {{ deckData?.studiedCards ?? 0 }} cards today.</p>
                 <p class="text-center text-secondary pt-3" v-if="!deckData || (deckData?.studiedTime ?? 0) == 0">You haven't studied anything today!</p>
+                <div v-if="deckData?.studiedCards == -1">
+                    <div>
+                        <h2>Upload your Anki Collection</h2>
+                    </div>
+                    <form>
+                        <div class="mb-3">
+    						<label for="formFile" class="form-label">Choose the Collection file</label>
+    						<input class="form-control" type="file" id="formFile" name="formFile" @change="onFileChanged($event)">
+    					</div>
+                        <div class="my-3">
+                            <div class="form-actions mb-2">
+                                <button class="btn btn-primary rounded py-2 mx-3 d-inline-block" type="submit"
+                                    @click="onSubmittedFile($event)" :disabled="!file">Upload Collection</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             <div class="col-md-1 order-md-1 d-none d-lg-block">

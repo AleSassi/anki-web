@@ -20,8 +20,8 @@ def collection_get(request: Request):
 	col = get_collection(token_data)
 	resp_data = {
 		"decks": [],
-		"studiedCards": 0,
-		"studiedTime": 0
+		"studiedCards": -1,
+		"studiedTime": -1
 	}
 	if col is not None:
 		dueTree = col.sched.deckDueTree()
@@ -59,7 +59,8 @@ def collection_put(request: Request, file: UploadFile = File(...)):
 				f.write(contents)
 			#Check that the file being written is an Anki collection
 			is_sqlite = isSQLite3(coll_path)
-	except Exception:
+	except Exception as e:
+		print(e)
 		raise HTTPException(status_code=500, detail="There was an error uploading the file")
 	finally:
 		file.file.close()
@@ -88,5 +89,5 @@ def isSQLite3(filename):
 
     with open(filename, 'rb') as fd:
         header = fd.read(100)
-
-    return header[:16] == 'SQLite format 3\x00'
+	
+    return header[:22] == b'SQLite format 3\x00\x10\x00\x02\x02\x00@'

@@ -5,7 +5,10 @@ from anki.storage import Collection
 import os
 
 def get_collection_path(username: str) -> str:
-    return "/app/data/" + username + '/collection.anki2'
+    basedir = "/app/data/" + username
+    if not os.path.exists(basedir):
+        os.mkdir(basedir)
+    return basedir + '/collection.anki2'
 
 def get_collection(token: TokenData) -> Collection | None:
     col = None#SessionStorage.get(token.session_id, "_collection")

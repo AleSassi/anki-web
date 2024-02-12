@@ -10,6 +10,7 @@ interface IHomeController {
     openDeck(did: number): void;
     closeDeck(): void;
     createDeck(name: string): Promise<boolean>;
+    uploadCollection(file: File): Promise<boolean>;
     getOpenDeck(): Ref<DeckData | null>;
     getOpenDeckID(): number;
     getDecks(): Promise<CollectionData | null>;
@@ -37,6 +38,26 @@ export class HomeController extends BaseController<CollectionData | null> implem
             message: "Deck created successfully"
         });
         return res != null;
+    }
+
+    async uploadCollection(file: File): Promise<boolean> {
+        var formData = new FormData();
+        formData.append("file", file);
+
+        const res = await super.put<DatalessResponse>("/collection", {
+            body: formData,
+            message: "Collection uploaded successfully",
+            config: {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            }
+        })
+
+        if (res) {
+            return true;
+        }
+        return false;
     }
 
     openDeck(did: number): void {
