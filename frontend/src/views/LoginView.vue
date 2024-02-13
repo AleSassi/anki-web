@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import TextField from '../components/TextField.vue'
-import logoURL from '../assets/logo.svg'
+import logoURL from '../assets/logo.png'
 import AuthController from '../controllers/auth_controller'
 import { ref, computed } from "vue";
 import router from "@/router/index";
@@ -72,7 +72,7 @@ async function _signUp() {
 	<div id="form-container" class="d-flex align-items-center py-4 bg-body-tertiary">
 		<main class="form-signin w-100 m-auto">
 			<form>
-				<img class="mb-4" :src="logoURL" alt="" width="72" height="57">
+				<img class="mb-4" style="max-width: 72px;" :src="logoURL" alt="">
 				<h1 class="h3 mb-3 fw-normal">{{ showLogin ? "Sign In" : "Create an account" }}</h1>
 
 				<TextField type="text" id="floatingInput" placeholder="Username" label="Username"

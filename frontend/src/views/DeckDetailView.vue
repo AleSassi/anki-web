@@ -80,12 +80,13 @@ function home() {
 				<div><h2>{{ deckData?.name }}</h2></div>
 				<div><div class="mb-2"></div></div>
 				
-				<div v-if="deckFinished">
-					<div class="mb-2">
+				<div>
+					<div class="mb-2" v-if="deckFinished">
 						<b>Congratulations! Today's portion of the deck has been completed.</b>
 					</div>
 					<div class="form-actions mb-2">
-						<button id="study_button" @click="home" class="btn btn-primary rounded mx-3 my-2 d-inline-block">Home</button>
+						<button id="study_button" @click="home" class="btn btn-primary rounded mx-3 my-2 d-inline-block" v-if="deckFinished">Home</button>
+						<button id="study_button" @click="study" class="btn btn-primary rounded mx-3 my-2 d-inline-block" v-if="!deckFinished">Start</button>
 						<button id="browse_button" @click="browse" class="btn btn-secondary rounded mx-3 my-2 d-inline-block" type="button">Browse</button>
 						<button id="stats_button" @click="stats" class="btn btn-secondary rounded mx-3 my-2 d-inline-block" type="button">Stats</button>
 						<button id="settings_button" @click="settings" class="btn btn-info rounded mx-3 my-2 d-inline-block">Settings</button>
@@ -93,15 +94,6 @@ function home() {
 						<button id="del_button" @click="delete_deck" class="btn btn-danger rounded mx-3 my-2 d-inline-block" type="button">Delete Deck</button>
 					</div>
 			  	</div>
-				<div v-if="!deckFinished" class="my-3">
-					<div class="form-actions mb-2">
-						<button id="study_button" @click="study" class="btn btn-primary rounded mx-3 my-2 d-inline-block">Start</button>
-						<button id="browse_button" @click="browse" class="btn btn-secondary rounded mx-3 my-2 d-inline-block" type="button">Browse</button>
-						<button id="stats_button" @click="stats" class="btn btn-secondary rounded mx-3 my-2 d-inline-block" type="button">Stats</button>
-						<button id="settings_button" @click="settings" class="btn btn-info rounded mx-3 my-2 d-inline-block">Settings</button>
-						<button id="del_button" @click="delete_deck" class="btn btn-danger rounded mx-3 my-2 d-inline-block" type="button">Delete Deck</button>
-					</div>
-				</div>
 
 				<DeckDetailContainer v-if="!deckFinished" />
 			</div>

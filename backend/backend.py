@@ -8,6 +8,10 @@ from routers.deck import overview, stats, options, create, study, custom_study, 
 from routers.deck import cards as deck_cards
 from routers.collection.models import models, fields
 from routers.cards import cards, import_file
+from dotenv import load_dotenv
+import os, json
+
+load_dotenv()
 
 backend = FastAPI()
 
@@ -17,9 +21,11 @@ origins = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://10.0.0.142:27708"
+    "http://127.0.0.1:5173"
 ]
+env_origins = json.loads(os.getenv('FRONTEND_URLS'))
+for env_origin in env_origins:
+    origins.append(env_origin)
 
 @backend.exception_handler(500)
 async def custom_http_exception_handler(request, exc):

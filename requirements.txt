@@ -6,3 +6,4 @@ passlib[bcrypt]
 python-multipart
 fastapi-users[sqlalchemy]
 anki==2.1.66
+python-dotenv
